@@ -3,12 +3,13 @@ local level = require("level")
 local snake = {}
 local size = 40
 local speed = 200
+snake.pendingChild = false
 
 snake.rowFrac = 0
 snake.colFrac = 0
 snake.row = 0
 snake.col = 0
-snake.direction = "down"
+snake.direction = "right"
 snake.active = {}
 
 snake.eatApple = {}
@@ -24,8 +25,8 @@ function snake.update(dt, grid)
         return
     end
 
-    local oldCol = snake.col
-    local oldRow = snake.row
+    local lastHeadCol = snake.col
+    local lastHeadRow = snake.row
 
     local delta = {}
 
@@ -51,16 +52,34 @@ function snake.update(dt, grid)
         end
     end
 
-    if oldCol ~= snake.col or oldRow ~= snake.row then
-        level.clear(grid, oldCol, oldRow)
+    if lastHeadCol ~= snake.col or lastHeadRow ~= snake.row then
+        if snake.pendingChild then
+            local tail = snake
+
+            repeat
+                tail = tail.child
+            until tail.child == nil
+
+            tail.child = {x = tail.lastX, y = tail.lastY}
+
+            do
+            end
+        end
+
+        level.clear(grid, lastHeadCol, lastHeadRow)
+
+        -- Move each child to the last position of its parent
 
         if grid[snake.col][snake.row] == 0 then
             level.setSnake(grid, snake.col, snake.row)
         end
-    end
 
-    if grid[snake.col][snake.row] == "apple" then
-        snake.eatApple(snake.col, snake.row)
+        if grid[snake.col][snake.row] == "apple" then
+            snake.eatApple(snake.col, snake.row)
+            pendingChild = true
+        end
+
+    -- move children as well
     end
 end
 
