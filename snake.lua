@@ -60,7 +60,7 @@ function snake.update(dt, grid)
     end
 
     if grid[snake.col + 1][snake.row + 1] == "apple" then
-        snake.eatApple(snake.col, snake.row + 1)
+        snake.eatApple(snake.col + 1, snake.row + 1)
     end
 end
 

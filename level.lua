@@ -32,7 +32,7 @@ function level.getApple(grid)
     for i = 1, 20 do
         for j = 1, 15 do
             if grid[i][j] == "apple" then
-                return {col = i, row = j}
+                return {col = i - 1, row = j - 1}
             end
         end
     end
