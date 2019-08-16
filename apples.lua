@@ -5,8 +5,8 @@ local apples = {}
 function apples.spawn(grid)
     local validPoints = {}
     local count = 0
-    for i = 1, 20 do
-        for j = 1, 15 do
+    for i = 0, 19 do
+        for j = 0, 14 do
             if grid[i][j] == 0 then
                 count = count + 1
                 local point = {x = i, y = j}

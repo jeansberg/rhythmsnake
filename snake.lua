@@ -16,7 +16,7 @@ snake.eatApple = {}
 function snake.start(eatApple, grid)
     snake.active = true
     snake.eatApple = eatApple
-    grid[snake.row + 1][snake.col + 1] = "head"
+    grid[snake.row][snake.col] = "head"
 end
 
 function snake.update(dt, grid)
@@ -52,15 +52,15 @@ function snake.update(dt, grid)
     end
 
     if oldCol ~= snake.col or oldRow ~= snake.row then
-        level.clear(grid, oldCol + 1, oldRow + 1)
+        level.clear(grid, oldCol, oldRow)
 
-        if grid[snake.col + 1][snake.row + 1] == 0 then
-            level.setSnake(grid, snake.col + 1, snake.row + 1)
+        if grid[snake.col][snake.row] == 0 then
+            level.setSnake(grid, snake.col, snake.row)
         end
     end
 
-    if grid[snake.col + 1][snake.row + 1] == "apple" then
-        snake.eatApple(snake.col + 1, snake.row + 1)
+    if grid[snake.col][snake.row] == "apple" then
+        snake.eatApple(snake.col, snake.row)
     end
 end
 
