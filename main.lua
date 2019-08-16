@@ -1,25 +1,19 @@
 local songtimer = require("songtimer")
 local snake = require("snake")
 local apples = require("apples")
+local level = require("level")
 local score = 0
 local beats = 0
 local clicked = false
 local grid = {}
-local apple = nil
 
 function love.load()
     math.randomseed(os.time())
     songtimer.start(1, scoreFn)
 
-    for i = 1, 20 do
-        grid[i] = {}
-        for j = 1, 15 do
-            grid[i][j] = 0
-        end
-    end
-
+    level.start(grid)
     snake.start(eatApple, grid)
-    apples.spawn(grid, setApple)
+    apples.spawn(grid)
 end
 
 function love.update(dt)
@@ -28,11 +22,10 @@ function love.update(dt)
 end
 
 function love.draw()
-    --love.graphics.print("Score: " .. score, 200, 200)
-    --love.graphics.print("Beats: " .. beats, 400, 200)
     snake.draw()
 
-    if apple.col then
+    local apple = level.getApple(grid)
+    if apple then
         apples.draw(apple)
     end
 end
@@ -59,15 +52,7 @@ function love.keypressed(key, scancode, isrepeat)
     end
 end
 
-function eatApple()
-    apple = {}
+function eatApple(x, y)
     print("Ate apple")
-end
-
-function setApple(point)
-    print("apple: " .. point.x .. ", " .. point.y)
-    apple = {}
-    apple.row = point.y
-    apple.col = point.x
-    grid[point.x + 1][point.y + 1] = "apple"
+    level.clear(grid, x, y)
 end

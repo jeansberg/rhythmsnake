@@ -1,8 +1,8 @@
-local apples = {}
-apples.setApple = {}
+local level = require("level")
 
-function apples.spawn(grid, setApple)
-    apples.setApple = setApple
+local apples = {}
+
+function apples.spawn(grid)
     local validPoints = {}
     local count = 0
     for i = 1, 20 do
@@ -17,7 +17,7 @@ function apples.spawn(grid, setApple)
 
     local rnd = math.random(count)
     print(validPoints[rnd].x .. " " .. validPoints[rnd].y)
-    setApple((validPoints[rnd]))
+    level.addApple(grid, validPoints[rnd].x, validPoints[rnd].y)
 end
 
 function apples.draw(apple)

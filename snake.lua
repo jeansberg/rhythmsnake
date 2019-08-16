@@ -1,3 +1,5 @@
+local level = require("level")
+
 local snake = {}
 local size = 40
 local speed = 200
@@ -50,28 +52,15 @@ function snake.update(dt, grid)
     end
 
     if oldCol ~= snake.col or oldRow ~= snake.row then
-        grid[oldCol + 1][oldRow + 1] = 0
-
-        local count = 0
+        level.clear(grid, oldCol + 1, oldRow + 1)
 
         if grid[snake.col + 1][snake.row + 1] == 0 then
-            grid[snake.col + 1][snake.row + 1] = "head"
-        end
-
-        for k, v in pairs(grid) do
-            for k1, v1 in pairs(grid[k]) do
-                count = count + 1
-                if v1 ~= 0 then
-                    print(k, k1, v1)
-                end
-            end
+            level.setSnake(grid, snake.col + 1, snake.row + 1)
         end
     end
 
     if grid[snake.col + 1][snake.row + 1] == "apple" then
-        print("crunchhhhhhhhhhhhhhhhhhhhhhhhhh!")
-        grid[snake.col + 1][snake.row + 1] = 0
-        snake.eatApple()
+        snake.eatApple(snake.col, snake.row + 1)
     end
 end
 
