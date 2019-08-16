@@ -41,11 +41,11 @@ function snake.update(dt, grid)
         end
     else
         if snake.direction == "down" then
-            delta = snake.rowFrac + dt * speed
+            delta = snake.rowFrac + dt * speed * 0.75
             snake.row = math.min(14, snake.row + math.floor(delta / 30))
             snake.rowFrac = delta % 30
         elseif snake.direction == "up" then
-            delta = snake.rowFrac + dt * speed
+            delta = snake.rowFrac + dt * speed * 0.75
             snake.row = math.max(0, snake.row - math.floor(delta / 30))
             snake.rowFrac = delta % 30
         end
