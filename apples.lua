@@ -16,7 +16,7 @@ function apples.spawn(grid)
     end
 
     local rnd = math.random(count)
-    print(validPoints[rnd].x .. " " .. validPoints[rnd].y)
+    --print(validPoints[rnd].x .. " " .. validPoints[rnd].y)
     level.addApple(grid, validPoints[rnd].x, validPoints[rnd].y)
 end
 

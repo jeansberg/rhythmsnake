@@ -9,6 +9,8 @@ snake.rowFrac = 0
 snake.colFrac = 0
 snake.row = 0
 snake.col = 0
+snake.lastRow = 0
+snake.lastCol = 0
 snake.direction = "right"
 snake.active = {}
 
@@ -25,8 +27,8 @@ function snake.update(dt, grid)
         return
     end
 
-    local lastHeadCol = snake.col
-    local lastHeadRow = snake.row
+    snake.lastCol = snake.col
+    snake.lastRow = snake.row
 
     local delta = {}
 
@@ -52,34 +54,55 @@ function snake.update(dt, grid)
         end
     end
 
-    if lastHeadCol ~= snake.col or lastHeadRow ~= snake.row then
+    if snake.lastCol ~= snake.col or snake.lastRow ~= snake.row then
+        print("moving head from " .. snake.lastCol .. ", " .. snake.lastRow .. " to " .. snake.col .. ", " .. snake.row)
+
         if snake.pendingChild then
-            local tail = snake
-
-            repeat
-                tail = tail.child
-            until tail.child == nil
-
-            tail.child = {x = tail.lastX, y = tail.lastY}
-
-            do
-            end
+            snake.addChild()
         end
 
-        level.clear(grid, lastHeadCol, lastHeadRow)
+        snake.moveChildren()
 
-        -- Move each child to the last position of its parent
+        level.clear(grid, snake.lastCol, snake.lastRow)
 
         if grid[snake.col][snake.row] == 0 then
             level.setSnake(grid, snake.col, snake.row)
         end
 
+        -- Found an apple
         if grid[snake.col][snake.row] == "apple" then
             snake.eatApple(snake.col, snake.row)
-            pendingChild = true
+            snake.pendingChild = true
         end
+    end
+end
 
-    -- move children as well
+function snake.addChild()
+    local snakeEnd = snake
+
+    while snakeEnd.child ~= nil do
+        snakeEnd = snakeEnd.child
+    end
+
+    snakeEnd.child = {col = snakeEnd.lastCol, row = snakeEnd.lastRow}
+    snake.pendingChild = false
+
+    print("Added child at " .. snakeEnd.child.col .. ", " .. snakeEnd.child.row)
+end
+
+function snake.moveChildren()
+    local snakeEnd = snake
+
+    while snakeEnd.child ~= nil do
+        local newCol = snakeEnd.lastCol
+        local newRow = snakeEnd.lastRow
+
+        snakeEnd = snakeEnd.child
+        snakeEnd.lastCol = snakeEnd.col
+        snakeEnd.lastRow = snakeEnd.row
+        print("moving from " .. snakeEnd.lastCol .. ", " .. snakeEnd.lastRow .. " to " .. newCol .. ", " .. newRow)
+        snakeEnd.col = newCol
+        snakeEnd.row = newRow
     end
 end
 
@@ -89,6 +112,13 @@ function snake.draw()
     end
 
     love.graphics.rectangle("fill", snake.col * size, snake.row * size, size, size)
+
+    local snakeEnd = snake
+    while snakeEnd.child ~= nil do
+        snakeEnd = snakeEnd.child
+
+        love.graphics.rectangle("fill", snakeEnd.col * size + 5, snakeEnd.row * size + 5, size - 10, size - 10)
+    end
 end
 
 function snake.setDirection(newDirection)
