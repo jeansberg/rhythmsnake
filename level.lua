@@ -38,4 +38,23 @@ function level.getApple(grid)
     end
 end
 
+function level.addTail(grid, col, row)
+    grid[col][row] = "tail"
+end
+
+function level.moveTail(grid, oldCol, oldRow, newCol, newRow)
+    grid[oldCol][oldRow] = 0
+    grid[newCol][newRow] = "tail"
+end
+
+function level.collision(grid, col, row)
+    local outOfBounds = col < 0 or col > 19 or row < 0 or row > 14
+
+    if outOfBounds then
+        return true
+    end
+
+    return grid[col][row] == "tail"
+end
+
 return level

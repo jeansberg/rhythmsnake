@@ -5,20 +5,24 @@ local size = 40
 local speed = 200
 snake.pendingChild = false
 
-snake.rowFrac = 0
-snake.colFrac = 0
-snake.row = 0
-snake.col = 0
-snake.lastRow = 0
-snake.lastCol = 0
-snake.direction = "right"
 snake.active = {}
 
 snake.eatApple = {}
+snake.die = {}
 
-function snake.start(eatApple, grid)
+function snake.start(eatApple, die, grid)
+    snake.rowFrac = 0
+    snake.colFrac = 0
+    snake.row = 0
+    snake.col = 0
+    snake.lastRow = 0
+    snake.lastCol = 0
+    snake.direction = "right"
+    snake.child = nil
+
     snake.active = true
     snake.eatApple = eatApple
+    snake.die = die
     grid[snake.row][snake.col] = "head"
 end
 
@@ -35,33 +39,37 @@ function snake.update(dt, grid)
     if snake.direction == "right" or snake.direction == "left" then
         if snake.direction == "right" then
             delta = snake.colFrac + dt * speed
-            snake.col = math.min(19, snake.col + math.floor(delta / 40))
+            snake.col = snake.col + math.floor(delta / 40)
             snake.colFrac = delta % 40
         elseif snake.direction == "left" then
             delta = snake.colFrac + dt * speed
-            snake.col = math.max(0, snake.col - math.floor(delta / 40))
+            snake.col = snake.col - math.floor(delta / 40)
             snake.colFrac = delta % 40
         end
     else
         if snake.direction == "down" then
             delta = snake.rowFrac + dt * speed * 0.75
-            snake.row = math.min(14, snake.row + math.floor(delta / 30))
+            snake.row = snake.row + math.floor(delta / 30)
             snake.rowFrac = delta % 30
         elseif snake.direction == "up" then
             delta = snake.rowFrac + dt * speed * 0.75
-            snake.row = math.max(0, snake.row - math.floor(delta / 30))
+            snake.row = snake.row - math.floor(delta / 30)
             snake.rowFrac = delta % 30
         end
     end
 
     if snake.lastCol ~= snake.col or snake.lastRow ~= snake.row then
-        print("moving head from " .. snake.lastCol .. ", " .. snake.lastRow .. " to " .. snake.col .. ", " .. snake.row)
-
-        if snake.pendingChild then
-            snake.addChild()
+        if level.collision(grid, snake.col, snake.row) then
+            print("bam!")
+            snake.die()
+            return
         end
 
-        snake.moveChildren()
+        if snake.pendingChild then
+            snake.addChild(grid)
+        end
+
+        snake.moveChildren(grid)
 
         level.clear(grid, snake.lastCol, snake.lastRow)
 
@@ -77,7 +85,7 @@ function snake.update(dt, grid)
     end
 end
 
-function snake.addChild()
+function snake.addChild(grid)
     local snakeEnd = snake
 
     while snakeEnd.child ~= nil do
@@ -85,12 +93,11 @@ function snake.addChild()
     end
 
     snakeEnd.child = {col = snakeEnd.lastCol, row = snakeEnd.lastRow}
+    level.addTail(grid, snakeEnd.lastCol, snakeEnd.lastRow)
     snake.pendingChild = false
-
-    print("Added child at " .. snakeEnd.child.col .. ", " .. snakeEnd.child.row)
 end
 
-function snake.moveChildren()
+function snake.moveChildren(grid)
     local snakeEnd = snake
 
     while snakeEnd.child ~= nil do
@@ -98,9 +105,11 @@ function snake.moveChildren()
         local newRow = snakeEnd.lastRow
 
         snakeEnd = snakeEnd.child
+
+        level.moveTail(grid, snakeEnd.col, snakeEnd.row, newCol, newRow)
+
         snakeEnd.lastCol = snakeEnd.col
         snakeEnd.lastRow = snakeEnd.row
-        print("moving from " .. snakeEnd.lastCol .. ", " .. snakeEnd.lastRow .. " to " .. newCol .. ", " .. newRow)
         snakeEnd.col = newCol
         snakeEnd.row = newRow
     end
