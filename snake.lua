@@ -4,6 +4,7 @@ local snake = {}
 local size = 40
 local speed = 200
 snake.pendingChild = false
+snake.pendingTurn = false
 
 snake.active = {}
 
@@ -59,6 +60,7 @@ function snake.update(dt, grid)
     end
 
     if snake.lastCol ~= snake.col or snake.lastRow ~= snake.row then
+        snake.pendingTurn = false
         if level.collision(grid, snake.col, snake.row) then
             print("bam!")
             snake.die()
@@ -131,25 +133,33 @@ function snake.draw()
 end
 
 function snake.setDirection(newDirection)
+    if snake.pendingTurn then
+        return
+    end
+
     if snake.direction == "left" or snake.direction == "right" then
         if newDirection == "down" then
             snake.direction = "down"
             snake.rowFrac = snake.colFrac
             snake.colFrac = 0
+            snake.pendingTurn = true
         elseif newDirection == "up" then
             snake.direction = "up"
             snake.rowFrac = snake.colFrac
             snake.colFrac = 0
+            snake.pendingTurn = true
         end
     elseif snake.direction == "down" or snake.direction == "up" then
         if newDirection == "left" then
             snake.direction = "left"
             snake.colFrac = snake.rowFrac
             snake.rowFrac = 0
+            snake.pendingTurn = true
         elseif newDirection == "right" then
             snake.direction = "right"
             snake.colFrac = snake.rowFrac
             snake.rowFrac = 0
+            snake.pendingTurn = true
         end
     end
 end
