@@ -1,6 +1,8 @@
 local snake = require("snake")
 local apples = require("apples")
 local level = require("level")
+local mainFont = {}
+local color = {0.02, 1, 0.63, 3}
 local score = 0
 local beats = 0
 local clicked = false
@@ -8,6 +10,9 @@ local grid = {}
 
 function love.load()
     math.randomseed(os.time())
+    love.window.setMode(800, 600)
+    mainFont = love.graphics.newFont("mago3.ttf", 48)
+    love.graphics.setFont(mainFont)
 
     level.start(grid)
     snake.start(eatApple, die, grid)
@@ -19,7 +24,10 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.print(score, 700, 0)
+    love.graphics.setColor(color)
+
+    love.graphics.print("Score: " .. score, 300, 20)
+    love.graphics.rectangle("line", 0, 80, 800, 520)
     snake.draw()
 
     local apple = level.getApple(grid)
@@ -36,7 +44,7 @@ end
 
 function eatApple(x, y)
     print("Ate apple")
-    score = score + 1
+    score = score + 100
     level.clear(grid, x, y)
     apples.spawn(grid)
 end

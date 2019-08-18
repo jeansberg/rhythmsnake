@@ -1,4 +1,5 @@
 local level = require("level")
+local color = {1, 0.98, 0.59, 1}
 
 local snake = {}
 local size = 40
@@ -118,17 +119,18 @@ function snake.moveChildren(grid)
 end
 
 function snake.draw()
+    love.graphics.setColor(color)
+
     if not snake.active then
         return
     end
-
-    love.graphics.rectangle("fill", snake.col * size, snake.row * size, size, size)
+    love.graphics.rectangle("fill", snake.col * size, snake.row * size + 80, size, size)
 
     local snakeEnd = snake
     while snakeEnd.child ~= nil do
         snakeEnd = snakeEnd.child
 
-        love.graphics.rectangle("fill", snakeEnd.col * size + 5, snakeEnd.row * size + 5, size - 10, size - 10)
+        love.graphics.rectangle("fill", snakeEnd.col * size + 5, snakeEnd.row * size + 5 + 80, size - 10, size - 10)
     end
 end
 
