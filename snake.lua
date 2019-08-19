@@ -15,12 +15,18 @@ snake.die = {}
 function snake.start(eatApple, die, grid)
     snake.rowFrac = 0
     snake.colFrac = 0
-    snake.row = 0
-    snake.col = 0
+    snake.row = 6
+    snake.col = 9
     snake.lastRow = 0
     snake.lastCol = 0
     snake.direction = "right"
-    snake.child = nil
+
+    snake.child = {col = snake.col - 1, row = snake.row}
+    level.addTail(grid, snake.child.col, snake.child.row)
+    local child = snake.child
+
+    child.child = {col = child.col - 1, row = child.row}
+    level.addTail(grid, child.child.col, child.child.row)
 
     snake.active = true
     snake.eatApple = eatApple
