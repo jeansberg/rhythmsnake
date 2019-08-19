@@ -3,7 +3,7 @@ local color = {1, 0.98, 0.59, 1}
 
 local snake = {}
 local size = 40
-local speed = 200
+local speed = 300
 snake.pendingChild = false
 snake.pendingTurn = false
 
@@ -69,8 +69,9 @@ function snake.update(dt, grid)
     if snake.lastCol ~= snake.col or snake.lastRow ~= snake.row then
         snake.pendingTurn = false
         if level.collision(grid, snake.col, snake.row) then
-            print("bam!")
-            snake.die()
+            snake.col = snake.lastCol
+            snake.row = snake.lastRow
+            snake.die(snake.col, snake.row)
             return
         end
 

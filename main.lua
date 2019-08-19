@@ -1,6 +1,7 @@
 local snake = require("snake")
 local apples = require("apples")
 local level = require("level")
+local particles = require("particles")
 local mainFont = {}
 local color = {0.02, 1, 0.63, 3}
 local score = 0
@@ -35,21 +36,23 @@ function love.update(dt)
             startGame()
         end
     end
+    particles.update(dt)
 end
 
 function love.draw()
+    love.graphics.setColor(color)
+
+    snake.draw()
+
+    local apple = level.getApple(grid)
+    if apple then
+        apples.draw(apple)
+    end
+    love.graphics.rectangle("line", 0, 80, 800, 520)
+
+    particles.draw()
     if running then
         love.graphics.print("Score: " .. score, 300, 20)
-        love.graphics.rectangle("line", 0, 80, 800, 520)
-
-        love.graphics.setColor(color)
-
-        snake.draw()
-
-        local apple = level.getApple(grid)
-        if apple then
-            apples.draw(apple)
-        end
     else
         love.graphics.print("Game over!", 290, 220)
         love.graphics.print("Score: " .. score, 300, 260)
@@ -63,13 +66,13 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function eatApple(x, y)
-    print("Ate apple")
     score = score + 100
     level.clear(grid, x, y)
+    particles.eatApple(x * 40, (y + 2) * 40)
     apples.spawn(grid)
 end
 
-function die()
+function die(x, y)
     running = false
-    print("Died")
+    particles.die(x * 40, (y + 2) * 40)
 end
