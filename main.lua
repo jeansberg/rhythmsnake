@@ -2,6 +2,7 @@ local snake = require("snake")
 local apples = require("apples")
 local level = require("level")
 local particles = require("particles")
+local music = require("music")
 local mainFont = {}
 local color = {0.02, 1, 0.63, 3}
 local score = 0
@@ -23,6 +24,7 @@ function startGame()
     score = 0
     running = true
 
+    music.start()
     level.start(grid)
     snake.start(eatApple, die, grid)
     apples.spawn(grid)
@@ -30,6 +32,7 @@ end
 
 function love.update(dt)
     if running then
+        music.update()
         snake.update(dt, grid)
     else
         if love.keyboard.isDown("return") then
@@ -40,6 +43,7 @@ function love.update(dt)
 end
 
 function love.draw()
+    music.draw()
     love.graphics.setColor(color)
 
     snake.draw()
@@ -73,6 +77,7 @@ function eatApple(x, y)
 end
 
 function die(x, y)
+    music.stop()
     running = false
     particles.die(x * 40, (y + 2) * 40)
 end
