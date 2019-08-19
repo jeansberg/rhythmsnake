@@ -13,6 +13,10 @@ local function initCanvas(width, height, size, color)
     return c
 end
 
+function particles.start()
+    systems = {}
+end
+
 function particles.eatApple(x, y)
     local img = initCanvas(40, 40, 10, appleColor)
     local system = love.graphics.newParticleSystem(img, 100)

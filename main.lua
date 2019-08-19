@@ -28,16 +28,13 @@ function startGame()
     level.start(grid)
     snake.start(eatApple, die, grid)
     apples.spawn(grid)
+    particles.start()
 end
 
 function love.update(dt)
     if running then
         music.update()
         snake.update(dt, grid)
-    else
-        if love.keyboard.isDown("return") then
-            startGame()
-        end
     end
     particles.update(dt)
 end
@@ -60,12 +57,17 @@ function love.draw()
     else
         love.graphics.print("Game over!", 290, 220)
         love.graphics.print("Score: " .. score, 300, 260)
+        love.graphics.print("Press any key to restart", 200, 300)
     end
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    if key == "right" or key == "left" or key == "down" or key == "up" then
-        snake.setDirection(key)
+    if running then
+        if key == "right" or key == "left" or key == "down" or key == "up" then
+            snake.setDirection(key)
+        end
+    else
+        startGame()
     end
 end
 
