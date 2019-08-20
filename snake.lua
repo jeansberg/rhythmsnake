@@ -19,6 +19,8 @@ function snake.start(eatApple, die, grid)
     snake.col = 9
     snake.lastRow = 0
     snake.lastCol = 0
+    snake.lastDirection = "right"
+
     snake.direction = "right"
 
     snake.child = {col = snake.col - 1, row = snake.row}
@@ -41,6 +43,7 @@ function snake.update(dt, grid)
 
     snake.lastCol = snake.col
     snake.lastRow = snake.row
+    snake.lastDirection = snake.direction
 
     local delta = {}
 
@@ -72,6 +75,7 @@ function snake.update(dt, grid)
             snake.col = snake.lastCol
             snake.row = snake.lastRow
             snake.die(snake.col, snake.row)
+            snake.active = false
             return
         end
 
@@ -102,7 +106,7 @@ function snake.addChild(grid)
         snakeEnd = snakeEnd.child
     end
 
-    snakeEnd.child = {col = snakeEnd.lastCol, row = snakeEnd.lastRow}
+    snakeEnd.child = {col = snakeEnd.lastCol, row = snakeEnd.lastRow, direction = snakeEnd.direction}
     level.addTail(grid, snakeEnd.lastCol, snakeEnd.lastRow)
     snake.pendingChild = false
 end
@@ -113,6 +117,7 @@ function snake.moveChildren(grid)
     while snakeEnd.child ~= nil do
         local newCol = snakeEnd.lastCol
         local newRow = snakeEnd.lastRow
+        local newDirection = snakeEnd.lastDirection
 
         snakeEnd = snakeEnd.child
 
@@ -120,25 +125,55 @@ function snake.moveChildren(grid)
 
         snakeEnd.lastCol = snakeEnd.col
         snakeEnd.lastRow = snakeEnd.row
+        snakeEnd.lastDirection = snakeEnd.direction
+
         snakeEnd.col = newCol
         snakeEnd.row = newRow
+        snakeEnd.direction = newDirection
     end
 end
 
-function snake.draw()
+function snake.draw(flag)
     love.graphics.setColor(color)
 
     if not snake.active then
         return
     end
-    love.graphics.rectangle("fill", snake.col * size, snake.row * size + 80, size, size)
+    local x = snake.col * size + 50
+    local y = snake.row * size + 80 + 50
+    love.graphics.rectangle("fill", x, y, size, size)
 
     local snakeEnd = snake
     while snakeEnd.child ~= nil do
         snakeEnd = snakeEnd.child
 
-        love.graphics.rectangle("fill", snakeEnd.col * size + 5, snakeEnd.row * size + 5 + 80, size - 10, size - 10)
+        local tailX = snakeEnd.col * size + 5 + 50
+        local tailY = snakeEnd.row * size + 5 + 80 + 50
+        if snakeEnd.child == nil then
+            tailX, tailY = snake.wiggle(tailX, tailY, snakeEnd.direction, flag)
+        end
+
+        love.graphics.rectangle("fill", tailX, tailY, size - 10, size - 10)
     end
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+function snake.wiggle(x, y, direction, flag)
+    if flag then
+        if direction == "left" or direction == "right" then
+            y = y + 8
+        else
+            x = x + 8
+        end
+    else
+        if direction == "left" or direction == "right" then
+            y = y - 8
+        else
+            x = x - 8
+        end
+    end
+
+    return x, y
 end
 
 function snake.setDirection(newDirection)

@@ -10,6 +10,8 @@ local function initCanvas(width, height, size, color)
     love.graphics.setColor(color)
     love.graphics.rectangle("fill", width / 2, height / 2, size, size)
     love.graphics.setCanvas() -- Switch back to drawing on main screen
+    love.graphics.setColor(1, 1, 1, 1)
+
     return c
 end
 

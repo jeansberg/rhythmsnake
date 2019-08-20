@@ -39,10 +39,20 @@ function level.getApple(grid)
 end
 
 function level.addTail(grid, col, row)
+    if row == nil then
+        print("row was nil")
+        return
+    end
+
     grid[col][row] = "tail"
 end
 
 function level.moveTail(grid, oldCol, oldRow, newCol, newRow)
+    if newRow == nil then
+        print("row was nil")
+        return
+    end
+
     grid[oldCol][oldRow] = 0
     grid[newCol][newRow] = "tail"
 end
