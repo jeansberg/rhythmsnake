@@ -3,7 +3,7 @@ local color = {1, 0.98, 0.59, 1}
 
 local snake = {}
 local size = 40
-local speed = 300
+local speed = 266
 snake.pendingChild = false
 snake.pendingTurn = false
 
@@ -160,16 +160,26 @@ end
 
 function snake.wiggle(x, y, direction, flag)
     if flag then
-        if direction == "left" or direction == "right" then
-            y = y + 8
-        else
-            x = x + 8
+        --wiggle right
+        if direction == "left" then
+            y = y - 10
+        elseif direction == "right" then
+            y = y + 10
+        elseif direction == "up" then
+            x = x + 10
+        elseif direction == "down" then
+            x = x - 10
         end
     else
-        if direction == "left" or direction == "right" then
-            y = y - 8
-        else
-            x = x - 8
+        --wiggle left
+        if direction == "left" then
+            y = y + 10
+        elseif direction == "right" then
+            y = y - 10
+        elseif direction == "up" then
+            x = x - 10
+        elseif direction == "down" then
+            x = x + 10
         end
     end
 
@@ -192,6 +202,8 @@ function snake.setDirection(newDirection)
             snake.rowFrac = snake.colFrac
             snake.colFrac = 0
             snake.pendingTurn = true
+        else
+            return false
         end
     elseif snake.direction == "down" or snake.direction == "up" then
         if newDirection == "left" then
@@ -204,8 +216,12 @@ function snake.setDirection(newDirection)
             snake.colFrac = snake.rowFrac
             snake.rowFrac = 0
             snake.pendingTurn = true
+        else
+            return false
         end
     end
+
+    return true
 end
 
 return snake

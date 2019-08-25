@@ -48,8 +48,8 @@ function level.addTail(grid, col, row)
 end
 
 function level.moveTail(grid, oldCol, oldRow, newCol, newRow)
-    if newRow == nil then
-        print("row was nil")
+    if oldRow == nil then
+        print("oldRow was nil")
         return
     end
 

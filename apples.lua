@@ -1,5 +1,5 @@
 local level = require("level")
-local color = {1, 0.44, 0.91, 1}
+local color = {255 / 255, 113 / 255, 206 / 255}
 
 local apples = {}
 

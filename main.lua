@@ -5,6 +5,8 @@ local particles = require("particles")
 local music = require("music")
 local moonshine = require("moonshine")
 
+local green = {5 / 255, 255 / 255, 161 / 255}
+
 local darkgreen = {0.005, 0.25, 0.1575}
 local darkergreen = {0.0025, 0.125, 0.07875}
 local darkblue = {0, 0.40, 0.5}
@@ -21,12 +23,16 @@ local glowEffect = {}
 
 local flag = false
 
+local dieSfx = love.audio.newSource("die.wav", "static")
+local eatAppleSfx = love.audio.newSource("eatApple.wav", "static")
+eatAppleSfx:setVolume(0.3)
+
 function love.load()
     math.randomseed(os.time())
     love.window.setMode(900, 700)
     mainFont = love.graphics.newFont("mago3.ttf", 48)
     love.graphics.setFont(mainFont)
-    screenEffect = moonshine(moonshine.effects.chromasep).chain(moonshine.effects.crt)
+    screenEffect = moonshine(moonshine.effects.crt).chain(moonshine.effects.chromasep)
     screenEffect.chromasep.radius = 2
     screenEffect.chromasep.angle = 4
 
@@ -56,19 +62,24 @@ end
 function love.draw()
     screenEffect(
         function()
+            local oddRow = {}
+            local oddCol = {}
             for i = 0, 19 do
+                oddCol = i % 2 == 1
                 for j = 0, 12 do
-                    if j % 2 == 1 then
+                    oddRow = j % 2 == 1
+
+                    if oddRow then
                         if i % 2 == 1 then
-                            love.graphics.setColor(flag and darkergreen or darkgreen)
+                            love.graphics.setColor(flag and darkgreen or black)
                         else
-                            love.graphics.setColor(flag and darkgreen or darkergreen)
+                            love.graphics.setColor(flag and black or darkgreen)
                         end
                     else
                         if i % 2 == 1 then
-                            love.graphics.setColor(flag and darkgreen or darkergreen)
+                            love.graphics.setColor(flag and black or darkgreen)
                         else
-                            love.graphics.setColor(flag and darkergreen or darkgreen)
+                            love.graphics.setColor(flag and darkgreen or black)
                         end
                     end
 
@@ -88,6 +99,8 @@ function love.draw()
                 )
             end
 
+            music.draw()
+
             --love.graphics.rectangle("line", 50, 80, 800, 570)
             particles.draw()
             if running then
@@ -104,7 +117,10 @@ end
 function love.keypressed(key, scancode, isrepeat)
     if running then
         if key == "right" or key == "left" or key == "down" or key == "up" then
-            snake.setDirection(key)
+            local success = snake.setDirection(key)
+            if success then
+                music.hitKey()
+            end
         end
     else
         startGame()
@@ -112,7 +128,9 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function eatApple(x, y)
-    score = score + 100
+    love.audio.play(eatAppleSfx)
+    score = score + music.score()
+
     level.clear(grid, x, y)
     particles.eatApple(x * 40 + 50, (y + 2) * 40 + 50)
     apples.spawn(grid)
@@ -120,6 +138,8 @@ end
 
 function die(x, y)
     music.stop()
+    love.audio.play(dieSfx)
+
     running = false
     particles.die(x * 40 + 50, (y + 2) * 40 + 50)
 end
