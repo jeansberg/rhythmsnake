@@ -76,7 +76,7 @@ function music.hitKey()
     end
 end
 
-function music.score(score)
+function music.score()
     local points = 10 * multiplier
     multiplier = multiplier + 1
     return points

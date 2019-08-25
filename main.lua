@@ -5,18 +5,12 @@ local particles = require("particles")
 local music = require("music")
 local moonshine = require("moonshine")
 
-local green = {5 / 255, 255 / 255, 161 / 255}
-
 local darkgreen = {0.005, 0.25, 0.1575}
-local darkergreen = {0.0025, 0.125, 0.07875}
-local darkblue = {0, 0.40, 0.5}
 local black = {0, 0, 0}
 
 local mainFont = {}
 local score = 0
 local running = true
-local beats = 0
-local clicked = false
 local grid = {}
 local screenEffect = {}
 local glowEffect = {}
@@ -63,7 +57,6 @@ function love.draw()
     screenEffect(
         function()
             local oddRow = {}
-            local oddCol = {}
             for i = 0, 19 do
                 oddCol = i % 2 == 1
                 for j = 0, 12 do
@@ -101,7 +94,6 @@ function love.draw()
 
             music.draw()
 
-            --love.graphics.rectangle("line", 50, 80, 800, 570)
             particles.draw()
             if running then
                 love.graphics.print("Score: " .. score, 350, 70)

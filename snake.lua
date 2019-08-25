@@ -91,7 +91,6 @@ function snake.update(dt, grid)
             level.setSnake(grid, snake.col, snake.row)
         end
 
-        -- Found an apple
         if grid[snake.col][snake.row] == "apple" then
             snake.eatApple(snake.col, snake.row)
             snake.pendingChild = true
