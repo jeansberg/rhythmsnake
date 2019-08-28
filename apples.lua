@@ -3,17 +3,35 @@ local color = {255 / 255, 113 / 255, 206 / 255}
 
 local apples = {}
 
-function apples.spawn(grid)
+function apples.notPendingTail(i, j, snake)
+    if snake.pendingChild == nil then
+        return true
+    end
+    local pending = snake.pendingChild.lastCol == i and snake.pendingChild.lastRow == j
+    return not pending
+end
+
+function apples.spawn(grid, snake)
+    local snakeEnd = snake
+    while snakeEnd.child ~= nil do
+        snakeEnd = snakeEnd.child
+    end
+
     local validPoints = {}
     local count = 0
-    for i = 0, 19 do
-        for j = 0, 12 do
-            if grid[i][j] == 0 then
+    for i = 8, 11 do
+        for j = 4, 8 do
+            if grid[i][j] == 0 and apples.notPendingTail(i, j, snake) then
                 count = count + 1
                 local point = {x = i, y = j}
                 validPoints[count] = point
             end
         end
+    end
+
+    print(count .. " valid spawn points!")
+    if count == 0 then
+        return
     end
 
     local rnd = math.random(count)

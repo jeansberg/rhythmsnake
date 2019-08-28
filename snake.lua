@@ -4,7 +4,7 @@ local color = {1, 0.98, 0.59, 1}
 local snake = {}
 local size = 40
 local speed = 266
-snake.pendingChild = false
+snake.pendingChild = nil
 snake.pendingTurn = false
 
 snake.active = {}
@@ -23,6 +23,7 @@ function snake.start(eatApple, die, grid)
 
     snake.direction = "right"
 
+    level.setSnake(grid, snake.col, snake.row)
     snake.child = {col = snake.col - 1, row = snake.row}
     level.addTail(grid, snake.child.col, snake.child.row)
     local child = snake.child
@@ -79,8 +80,8 @@ function snake.update(dt, grid)
             return
         end
 
-        if snake.pendingChild then
-            snake.addChild(grid)
+        if snake.pendingChild ~= nil then
+            snake.addChild(grid, snake.pendingChild)
         end
 
         snake.moveChildren(grid)
@@ -93,21 +94,23 @@ function snake.update(dt, grid)
 
         if grid[snake.col][snake.row] == "apple" then
             snake.eatApple(snake.col, snake.row)
-            snake.pendingChild = true
+
+            local snakeEnd = snake
+
+            while snakeEnd.child ~= nil do
+                snakeEnd = snakeEnd.child
+            end
+
+            snake.pendingChild = snakeEnd
+            print("pending child " .. snake.pendingChild.lastCol .. ", " .. snake.pendingChild.lastRow)
         end
     end
 end
 
-function snake.addChild(grid)
-    local snakeEnd = snake
-
-    while snakeEnd.child ~= nil do
-        snakeEnd = snakeEnd.child
-    end
-
+function snake.addChild(grid, snakeEnd)
     snakeEnd.child = {col = snakeEnd.lastCol, row = snakeEnd.lastRow, direction = snakeEnd.direction}
     level.addTail(grid, snakeEnd.lastCol, snakeEnd.lastRow)
-    snake.pendingChild = false
+    snake.pendingChild = nil
 end
 
 function snake.moveChildren(grid)

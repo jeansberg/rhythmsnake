@@ -38,10 +38,10 @@ function startGame()
     score = 0
     running = true
 
-    music.start(hitBeat)
+    music.start(hitBeat, endSong)
     level.start(grid)
     snake.start(eatApple, die, grid)
-    apples.spawn(grid)
+    apples.spawn(grid, snake)
     particles.start()
 end
 
@@ -58,7 +58,6 @@ function love.draw()
         function()
             local oddRow = {}
             for i = 0, 19 do
-                oddCol = i % 2 == 1
                 for j = 0, 12 do
                     oddRow = j % 2 == 1
 
@@ -125,7 +124,7 @@ function eatApple(x, y)
 
     level.clear(grid, x, y)
     particles.eatApple(x * 40 + 50, (y + 2) * 40 + 50)
-    apples.spawn(grid)
+    apples.spawn(grid, snake)
 end
 
 function die(x, y)
@@ -134,6 +133,12 @@ function die(x, y)
 
     running = false
     particles.die(x * 40 + 50, (y + 2) * 40 + 50)
+end
+
+function endSong()
+    love.audio.play(dieSfx)
+
+    running = false
 end
 
 function hitBeat()

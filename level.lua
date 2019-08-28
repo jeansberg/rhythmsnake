@@ -17,10 +17,16 @@ function level.setSnake(grid, x, y)
             end
         end
     end
+
+    if grid[x][y] == "apple" then
+        print("Moved head on apple")
+    end
+
     grid[x][y] = "head"
 end
 
 function level.addApple(grid, x, y)
+    print("Added apple to " .. x .. ", " .. y .. " -- " .. grid[x][y])
     grid[x][y] = "apple"
 end
 
@@ -39,6 +45,10 @@ function level.getApple(grid)
 end
 
 function level.addTail(grid, col, row)
+    if grid[col][row] == "apple" then
+        print("Added tail on apple")
+    end
+
     if row == nil then
         print("row was nil")
         return
@@ -48,6 +58,10 @@ function level.addTail(grid, col, row)
 end
 
 function level.moveTail(grid, oldCol, oldRow, newCol, newRow)
+    if grid[newCol][newRow] == "apple" then
+        print("Moved tail on apple")
+    end
+
     if oldRow == nil then
         print("oldRow was nil")
         return
@@ -65,6 +79,20 @@ function level.collision(grid, col, row)
     end
 
     return grid[col][row] == "tail"
+end
+
+function level.nonTailAdjacent(grid, col, row)
+    local numAdjacent = 0
+    for i = col - 2, col + 2 do
+        for j = row - 2, row + 2 do
+            if grid[i][j] == "tail" then
+                numAdjacent = numAdjacent + 1
+            end
+        end
+    end
+
+    print(numAdjacent)
+    return numAdjacent == 0
 end
 
 return level
