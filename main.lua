@@ -32,6 +32,13 @@ function love.load()
     screenEffect.scanlines.frequency = 400
 
     appleEffect = moonshine(moonshine.effects.glow)
+    screenEffect(
+        function()
+            love.graphics.print("Loading...", 320, 300, 0, 1.5)
+        end
+    )
+    love.graphics.present()
+
     music.init()
     startGame()
 end
@@ -108,15 +115,14 @@ function love.draw()
             end
 
             music.draw()
-
             particles.draw()
+
             love.graphics.print("Rhythm Snake", 260, 10, 0, 1.5)
+            love.graphics.print("Score: " .. score, 350, 70)
 
             if running then
-                love.graphics.print("Score: " .. score, 350, 70)
             else
                 love.graphics.print("Game over!", 340, 220)
-                love.graphics.print("Score: " .. score, 350, 260)
                 love.graphics.print("Press any key to restart", 220, 300)
             end
         end
