@@ -1,19 +1,19 @@
 local level = {}
 
 function level.start(grid)
-    for i = 0, 19 do
-        grid[i] = {}
-        for j = 0, 12 do
-            grid[i][j] = 0
+    for x = 0, 19 do
+        grid[x] = {}
+        for y = 0, 12 do
+            grid[x][y] = 0
         end
     end
 end
 
 function level.setSnake(grid, x, y)
-    for i = 0, 19 do
-        for j = 0, 12 do
-            if grid[i][j] == "head" then
-                grid[i][j] = 0
+    for x = 0, 19 do
+        for y = 0, 12 do
+            if grid[x][y] == "head" then
+                grid[x][y] = 0
             end
         end
     end
@@ -26,7 +26,9 @@ function level.setSnake(grid, x, y)
 end
 
 function level.addApple(grid, x, y)
-    print("Added apple to " .. x .. ", " .. y .. " -- " .. grid[x][y])
+    -- if grid[x][y] ~= 0 then
+    --print("Added apple to " .. x .. ", " .. y .. " -- " .. grid[x][y])
+    --end
     grid[x][y] = "apple"
 end
 
@@ -35,10 +37,10 @@ function level.clear(grid, x, y)
 end
 
 function level.getApple(grid)
-    for i = 0, 19 do
-        for j = 0, 12 do
-            if grid[i][j] == "apple" then
-                return {col = i, row = j}
+    for x = 0, 19 do
+        for y = 0, 12 do
+            if grid[x][y] == "apple" then
+                return {col = x, row = y}
             end
         end
     end
@@ -46,7 +48,7 @@ end
 
 function level.addTail(grid, col, row)
     if grid[col][row] == "apple" then
-        print("Added tail on apple")
+        print("Added tail on apple" .. col .. ", " .. row)
     end
 
     if row == nil then
@@ -75,24 +77,19 @@ function level.collision(grid, col, row)
     local outOfBounds = col < 0 or col > 19 or row < 0 or row > 12
 
     if outOfBounds then
+        print("Out of bounds")
         return true
     end
 
-    return grid[col][row] == "tail"
-end
-
-function level.nonTailAdjacent(grid, col, row)
-    local numAdjacent = 0
-    for i = col - 2, col + 2 do
-        for j = row - 2, row + 2 do
-            if grid[i][j] == "tail" then
-                numAdjacent = numAdjacent + 1
-            end
-        end
+    if grid[col][row] == "tail" then
+        print("Tail collision")
+        return true
     end
 
-    print(numAdjacent)
-    return numAdjacent == 0
+    return false
+end
+
+function level.draw()
 end
 
 return level

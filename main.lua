@@ -4,16 +4,14 @@ local level = require("level")
 local particles = require("particles")
 local music = require("music")
 local moonshine = require("moonshine")
-
-local darkgreen = {0.005, 0.25, 0.1575}
-local black = {0, 0, 0}
+local colors = require("colors")
 
 local mainFont = {}
 local score = 0
 local running = true
 local grid = {}
 local screenEffect = {}
-local glowEffect = {}
+local appleEffect = {}
 
 local flag = false
 
@@ -26,11 +24,15 @@ function love.load()
     love.window.setMode(900, 700)
     mainFont = love.graphics.newFont("mago3.ttf", 48)
     love.graphics.setFont(mainFont)
-    screenEffect = moonshine(moonshine.effects.crt).chain(moonshine.effects.chromasep)
-    screenEffect.chromasep.radius = 2
-    screenEffect.chromasep.angle = 4
+    screenEffect =
+        moonshine(moonshine.effects.crt).chain(moonshine.effects.scanlines).chain(moonshine.effects.chromasep)
+    screenEffect.chromasep.radius = 3
+    screenEffect.chromasep.angle = 8
+    screenEffect.scanlines.opacity = 0.5
+    screenEffect.scanlines.frequency = 400
 
-    glowEffect = moonshine(moonshine.effects.glow)
+    appleEffect = moonshine(moonshine.effects.glow)
+    music.init()
     startGame()
 end
 
@@ -56,35 +58,49 @@ end
 function love.draw()
     screenEffect(
         function()
-            local oddRow = {}
-            for i = 0, 19 do
-                for j = 0, 12 do
-                    oddRow = j % 2 == 1
+            local oddRow = false
+            local oddCol = false
+            love.graphics.setColor(colors.gray)
+            love.graphics.rectangle("fill", 50, 130, 800, 520)
 
-                    if oddRow then
-                        if i % 2 == 1 then
-                            love.graphics.setColor(flag and darkgreen or black)
+            if music.multiplier > 1 then
+                local color = flag and colors.darken(colors.green) or colors.darken(colors.blue)
+                for i = 0, 19 do
+                    oddCol = i % 2 == 1
+                    for j = 0, 12 do
+                        love.graphics.setColor(colors.gray)
+                        oddRow = j % 2 == 1
+
+                        if oddRow then
+                            if oddCol and flag then
+                                love.graphics.setColor(color)
+                            end
+                            if not oddCol and not flag then
+                                love.graphics.setColor(color)
+                            end
                         else
-                            love.graphics.setColor(flag and black or darkgreen)
+                            if oddCol and not flag then
+                                love.graphics.setColor(color)
+                            end
+                            if not oddCol and flag then
+                                love.graphics.setColor(color)
+                            end
                         end
-                    else
-                        if i % 2 == 1 then
-                            love.graphics.setColor(flag and black or darkgreen)
-                        else
-                            love.graphics.setColor(flag and darkgreen or black)
+
+                        if grid[i][j] == "tail" then
+                        -- love.graphics.setColor(1, 1, 1)
                         end
+
+                        love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 130, 40, 40)
                     end
-
-                    love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 130, 40, 40)
                 end
             end
-            love.graphics.setColor(1, 1, 1, 1)
 
             snake.draw(flag)
 
             local apple = level.getApple(grid)
             if apple then
-                glowEffect(
+                appleEffect(
                     function()
                         apples.draw(apple, flag)
                     end
@@ -94,6 +110,8 @@ function love.draw()
             music.draw()
 
             particles.draw()
+            love.graphics.print("Rhythm Snake", 260, 10, 0, 1.5)
+
             if running then
                 love.graphics.print("Score: " .. score, 350, 70)
             else

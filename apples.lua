@@ -1,36 +1,38 @@
 local level = require("level")
-local color = {255 / 255, 113 / 255, 206 / 255}
-
+local colors = require("colors")
 local apples = {}
 
-function apples.notPendingTail(i, j, snake)
-    if snake.pendingChild == nil then
-        return true
+function apples.pendingSnake(x, y, pendingSnakePos)
+    for _, v in pairs(pendingSnakePos) do
+        if v.x == x and v.y == y then
+            return true
+        end
     end
-    local pending = snake.pendingChild.lastCol == i and snake.pendingChild.lastRow == j
-    return not pending
+    return false
 end
 
 function apples.spawn(grid, snake)
-    local snakeEnd = snake
-    while snakeEnd.child ~= nil do
-        snakeEnd = snakeEnd.child
+    local pendingSnakePos = snake.pendingPosition
+    local str = ""
+    for _, v in pairs(pendingSnakePos) do
+        str = str .. v.x .. "," .. v.y .. " "
     end
 
     local validPoints = {}
     local count = 0
-    for i = 8, 11 do
-        for j = 4, 8 do
-            if grid[i][j] == 0 and apples.notPendingTail(i, j, snake) then
+    for x = 0, 19 do
+        for y = 0, 12 do
+            if apples.pendingSnake(x, y, pendingSnakePos) == false then
                 count = count + 1
-                local point = {x = i, y = j}
+                local point = {x = x, y = y}
                 validPoints[count] = point
             end
         end
     end
 
-    print(count .. " valid spawn points!")
+    --print(count .. " valid spawn points!")
     if count == 0 then
+        print("No valid points")
         return
     end
 
@@ -41,9 +43,9 @@ end
 function apples.draw(apple, flag)
     local x = apple.col * 40 + 50
     local y = apple.row * 40 + 80 + 50
-    love.graphics.setColor(color)
+    love.graphics.setColor(colors.pink)
     love.graphics.rectangle("fill", x, y, 40, 40)
-    love.graphics.setColor(0, 0, 0)
+    love.graphics.setColor(colors.black)
 
     local offset = flag and -4 or 4
     love.graphics.rectangle("fill", x + 4 + offset, y + 10, 10, 10)
