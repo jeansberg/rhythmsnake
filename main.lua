@@ -24,6 +24,9 @@ function love.load()
     love.window.setMode(900, 700)
     mainFont = love.graphics.newFont("mago3.ttf", 48)
     love.graphics.setFont(mainFont)
+    love.graphics.print("Loading...", 320, 300, 0, 1.5)
+    love.graphics.present()
+    
     screenEffect =
         moonshine(moonshine.effects.crt).chain(moonshine.effects.scanlines).chain(moonshine.effects.chromasep)
     screenEffect.chromasep.radius = 3
@@ -32,12 +35,6 @@ function love.load()
     screenEffect.scanlines.frequency = 400
 
     appleEffect = moonshine(moonshine.effects.glow)
-    screenEffect(
-        function()
-            love.graphics.print("Loading...", 320, 300, 0, 1.5)
-        end
-    )
-    love.graphics.present()
 
     music.init()
     startGame()

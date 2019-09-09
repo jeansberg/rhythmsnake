@@ -11,15 +11,11 @@ local lastPos = -1
 local gracePeriod = false
 local state = {}
 local indicator = {x = 250, y = 660, width = 400, height = 40}
-local resetSfx = love.audio.newSource("reset.wav", "static")
+local resetSfx = {}
 
 music.callback = {}
 music.endSong = {}
 
-local function round(number, decimals)
-    local power = 10 ^ decimals
-    return math.floor(number * power) / power
-end
 
 function music.crossFadeTo(song)
     if song == "active" then
@@ -32,6 +28,7 @@ function music.crossFadeTo(song)
 end
 
 function music.init()
+    resetSfx = love.audio.newSource("reset.wav", "static")
     activeLoop = love.audio.newSource(activePath, "static")
     activeLoop:setLooping(true)
     activeLoop:setVolume(0)

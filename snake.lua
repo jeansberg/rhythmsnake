@@ -121,7 +121,7 @@ function snake.update(dt, grid)
 
             snake.pendingChild = snakeEnd
             table.insert(snake.pendingPosition, {x = snakeEnd.col, y = snakeEnd.row})
-            print("pending child " .. snake.pendingChild.lastCol .. ", " .. snake.pendingChild.lastRow)
+            --print("pending child " .. snake.pendingChild.lastCol .. ", " .. snake.pendingChild.lastRow)
             snake.eatApple(snake.col, snake.row)
         end
     end
