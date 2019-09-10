@@ -86,6 +86,9 @@ end
 function music.draw()
     love.graphics.setColor(music.multiplier == 1 and colors.white or colors.green)
     love.graphics.print("Multiplier: " .. music.multiplier, 650, 660)
+    if gracePeriod then
+        love.graphics.rectangle("fill",600,660, 40,40)
+    end
     --love.graphics.print(round(beatFrac, 1), 150, 660)
     --love.graphics.print(beat, 250, 660)
 
@@ -119,6 +122,10 @@ function music.hitKey()
     if state == "waitingForKey" then
         state = "waitingForBeat"
         lastPos = beatFrac
+
+        if gracePeriod == true then
+            gracePeriod = false
+        end
     end
 end
 
