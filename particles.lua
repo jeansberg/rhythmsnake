@@ -49,6 +49,33 @@ function particles.die(x, y)
     table.insert(systems, system)
 end
 
+function particles.special(x, y)
+    local img = initCanvas(40, 40, 40, colors.yellow)
+    local system = love.graphics.newParticleSystem(img, 100)
+    system:setPosition(x, y)
+    system:setEmitterLifetime(0.1)
+    system:setParticleLifetime(1, 2)
+    system:setEmissionRate(100)
+    system:setSpread(8)
+    system:setSpeed(200)
+    system:setSpin(1)
+    system:setColors(1, 1, 1, 1, colors.yellow[1], colors.yellow[2], colors.yellow[3], 1, 1, 1, 1, 0)
+
+    table.insert(systems, system)
+end
+
+function particles.random()
+    local type = math.random(0, 1)
+    local x = math.random(0,900)
+    local y = math.random(0, 700)
+
+    if type == 0 then
+        particles.special(x,y)
+    elseif type == 1 then
+        particles.eatApple(x,y)
+    end
+end
+
 function particles.draw()
     love.graphics.setColor(1, 1, 1, 1)
     for k, v in pairs(systems) do
