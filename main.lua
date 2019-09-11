@@ -9,7 +9,7 @@ local colors = require("colors")
 
 local mainFont = {}
 local score = 0
-local running = true
+local state = {}
 local grid = {}
 local screenEffect = {}
 local appleEffect = {}
@@ -27,6 +27,7 @@ function love.load()
     screenEffect = moonshine(moonshine.effects.crt).chain(
                        moonshine.effects.scanlines).chain(
                        moonshine.effects.chromasep)
+                       .chain(moonshine.effects.glow)
     screenEffect.chromasep.radius = 3
     screenEffect.chromasep.angle = 8
     screenEffect.scanlines.opacity = 0.5
@@ -35,12 +36,17 @@ function love.load()
     appleEffect = moonshine(moonshine.effects.glow)
 
     music.init()
-    startGame()
+    showMenu()
 end
+
+function showMenu() state = "start" end
 
 function startGame()
     score = 0
-    running = true
+    state = "running"
+
+    screenEffect.chromasep.radius = 3
+    screenEffect.chromasep.angle = 8
 
     music.start(hitBeat, endSong)
     level.start(grid)
@@ -50,7 +56,7 @@ function startGame()
 end
 
 function love.update(dt)
-    if running then
+    if state == "running" then
         music.update()
         snake.update(dt, grid)
     end
@@ -59,6 +65,14 @@ end
 
 function love.draw()
     screenEffect(function()
+        love.graphics.print("Rhythm Snake", 260, 10, 0, 1.5)
+
+        if state == "start" then
+            love.graphics.print("Goal: Eat apples", 300, 200, 0)
+            love.graphics.print("Controls: Arrow keys or WASD", 190, 250, 0)
+            love.graphics.print("Press SPACE to start", 270, 350)
+            return
+        end
         local oddRow = false
         local oddCol = false
         love.graphics.setColor(colors.gray)
@@ -109,10 +123,9 @@ function love.draw()
         music.draw()
         particles.draw()
 
-        love.graphics.print("Rhythm Snake", 260, 10, 0, 1.5)
         love.graphics.print("Score: " .. score, 350, 70)
 
-        if running then
+        if state == "running" then
         else
             love.graphics.print("Game over!", 340, 220)
             love.graphics.print("Press SPACE to restart", 240, 300)
@@ -137,7 +150,7 @@ end
 function love.keypressed(key, _, _)
     local command = getCommand(key)
 
-    if running then
+    if state == "running" then
         print(command)
 
         if command == "right" or command == "left" or command == "down" or
@@ -145,11 +158,15 @@ function love.keypressed(key, _, _)
             local success = snake.setDirection(command)
             if success then music.hitKey() end
         end
-    elseif command == "space" then
-        startGame()
-    else
-        audio.play("bang")
-        particles.random()
+    elseif state == "gameover" then
+        if command == "space" then
+            startGame()
+        else
+            audio.play("bang")
+            particles.random()
+        end
+    elseif state == "start" then
+        if command == "space" then startGame() end
     end
 end
 
@@ -166,7 +183,7 @@ function die(x, y)
     music.endGame()
     audio.play("die")
 
-    running = false
+    state = "gameover"
     particles.die(x * 40 + 50, (y + 2) * 40 + 50)
 end
 
