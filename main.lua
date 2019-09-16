@@ -4,7 +4,7 @@ local level = require("level")
 local particles = require("particles")
 local audio = require("audio")
 local music = require("music")
-local moonshine = require("moonshine")
+local moonshine = require("lib/moonshine")
 local colors = require("colors")
 
 local mainFont = {}
@@ -20,7 +20,7 @@ function love.load()
     math.randomseed(os.time())
     love.window.setMode(900, 700)
     love.window.setTitle("Rhythm Snake")
-    mainFont = love.graphics.newFont("mago3.ttf", 48)
+    mainFont = love.graphics.newFont("content/mago3.ttf", 48)
     love.graphics.setFont(mainFont)
     love.graphics.print("Loading...", 320, 300, 0, 1.5)
     love.graphics.present()
@@ -36,7 +36,7 @@ function love.load()
 
     appleEffect = moonshine(moonshine.effects.glow)
 
-    music.init()
+    audio.init()
     showMenu()
 end
 

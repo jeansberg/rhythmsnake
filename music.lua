@@ -1,74 +1,26 @@
 local colors = require("colors")
+local audio = require("audio")
 local music = {}
-local passivePath = "psy_passive.ogg"
-local activePath = "psy_active.ogg"
-local gameoverPath = "psy_gameover.ogg"
-local activeLoop = {}
-local passiveLoop = {}
-local gameoverLoop = {}
 local lastBeat = -1
 local beat = 0
 local beatFrac = 0
 local gracePeriod = false
 local state = {}
 local indicator = {x = 250, y = 660, width = 400, height = 40}
-local resetSfx = {}
 
 music.callback = {}
 
-function music.crossFadeTo(song)
-    if song == "active" then
-        gameoverLoop:setVolume(0)
-        passiveLoop:setVolume(0)
-        activeLoop:setVolume(1)
-    elseif song == "passive" then
-        gameoverLoop:setVolume(0)
-        passiveLoop:setVolume(1)
-        activeLoop:setVolume(0)
-    else
-        gameoverLoop:setVolume(1)
-        passiveLoop:setVolume(0)
-        activeLoop:setVolume(0)
-    end
-end
-
-function music.init()
-    resetSfx = love.audio.newSource("reset.wav", "static")
-
-    activeLoop = love.audio.newSource(activePath, "static")
-    activeLoop:setLooping(true)
-    activeLoop:setVolume(0)
-
-    passiveLoop = love.audio.newSource(passivePath, "static")
-    passiveLoop:setLooping(true)
-    passiveLoop:setVolume(0)
-
-    gameoverLoop = love.audio.newSource(gameoverPath, "static")
-    gameoverLoop:setLooping(true)
-    gameoverLoop:setVolume(0)
-end
-
 function music.start(callback)
     music.callback = callback
-
-    music.crossFadeTo("passive")
-
-    love.audio.stop(activeLoop)
-    love.audio.stop(passiveLoop)
-    love.audio.stop(gameoverLoop)
-
-    love.audio.play(activeLoop)
-    love.audio.play(passiveLoop)
-    love.audio.play(gameoverLoop)
-
+    audio.start()
     music.multiplier = 1
     state = "waitingForBeat"
 end
 
-function music.endGame() music.crossFadeTo("gameover") end
+function music.endGame() audio.toggleSong("gameoverSong") end
 
 function music.update()
-    local songTime = activeLoop:tell()
+    local songTime = audio.getSongTime()
 
     beat, beatFrac = math.modf(songTime / (60 / 133))
     local newBeat = beat ~= lastBeat
@@ -81,8 +33,8 @@ function music.update()
 
             if music.multiplier ~= 1 and not gracePeriod then
                 music.multiplier = 1
-                music.crossFadeTo("passive")
-                love.audio.play(resetSfx)
+                audio.toggleSong("passiveSong")
+                audio.play("reset")
             end
 
             gracePeriod = false
@@ -125,7 +77,7 @@ function music.score()
     local points = 10 * music.multiplier
     music.multiplier = music.multiplier + 1
     if music.multiplier == 2 then
-        music.crossFadeTo("active")
+        audio.toggleSong("activeSong")
         gracePeriod = true
     end
 
