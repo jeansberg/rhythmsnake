@@ -4,7 +4,6 @@ local colors = require("colors")
 local snake = {}
 local size = 40
 local speed = 266
-local headCanvas = love.graphics.newCanvas()
 snake.pendingChild = nil
 snake.pendingTurn = false
 snake.pendingPosition = {}
@@ -44,9 +43,7 @@ function snake.start(eatApple, die, grid)
 end
 
 function snake.update(dt, grid)
-    if not snake.active then
-        return
-    end
+    if not snake.active then return end
 
     snake.lastCol = snake.col
     snake.lastRow = snake.row
@@ -115,20 +112,22 @@ function snake.update(dt, grid)
         if grid[snake.col][snake.row] == "apple" then
             local snakeEnd = snake
 
-            while snakeEnd.child ~= nil do
-                snakeEnd = snakeEnd.child
-            end
+            while snakeEnd.child ~= nil do snakeEnd = snakeEnd.child end
 
             snake.pendingChild = snakeEnd
-            table.insert(snake.pendingPosition, {x = snakeEnd.col, y = snakeEnd.row})
-            --print("pending child " .. snake.pendingChild.lastCol .. ", " .. snake.pendingChild.lastRow)
+            table.insert(snake.pendingPosition,
+                         {x = snakeEnd.col, y = snakeEnd.row})
             snake.eatApple(snake.col, snake.row)
         end
     end
 end
 
 function snake.addChild(grid, snakeEnd)
-    snakeEnd.child = {col = snakeEnd.col, row = snakeEnd.row, direction = snakeEnd.direction}
+    snakeEnd.child = {
+        col = snakeEnd.col,
+        row = snakeEnd.row,
+        direction = snakeEnd.direction
+    }
     level.addTail(grid, snakeEnd.col, snakeEnd.row)
     snake.pendingChild = nil
 end
@@ -164,26 +163,12 @@ function snake.drawHead()
 
     love.graphics.rectangle("fill", x, y, size, size)
     love.graphics.setColor(colors.black)
-    --[[ 
-    if snake.direction == "left" then
-        love.graphics.rectangle("fill", x + 10, y + 5, 10, 10)
-    elseif snake.direction == "right" then
-        love.graphics.rectangle("fill", x + 20, y + 5, 10, 10)
-    elseif snake.direction == "up" then
-        --love.graphics.rectangle("fill", x + 5, y + 10, 10, 10)
-        --love.graphics.rectangle("fill", x + 25, y + 10, 10, 10)
-    elseif snake.direction == "down" then
-    --love.graphics.rectangle("fill", x + 5, y + 20, 10, 10)
-    --love.graphics.rectangle("fill", x + 25, y + 20, 10, 10)
-    end ]]
 end
 
 function snake.draw(flag)
     love.graphics.setColor(colors.purple)
 
-    if not snake.active then
-        return
-    end
+    if not snake.active then return end
 
     snake.drawHead()
     love.graphics.setColor(colors.purple)
@@ -201,14 +186,11 @@ function snake.draw(flag)
         love.graphics.rectangle("fill", tailX, tailY, size - 10, size - 10)
     end
     love.graphics.setColor(1, 1, 1, 1)
-    for _, v in pairs(snake.pendingPosition) do
-        --love.graphics.rectangle("fill", v.x * size + 50, v.y * size + 80 + 50, size - 10, size - 10)
-    end
 end
 
 function snake.wiggle(x, y, direction, flag)
     if flag then
-        --wiggle right
+        -- wiggle right
         if direction == "left" then
             y = y - 10
         elseif direction == "right" then
@@ -219,7 +201,7 @@ function snake.wiggle(x, y, direction, flag)
             x = x - 10
         end
     else
-        --wiggle left
+        -- wiggle left
         if direction == "left" then
             y = y + 10
         elseif direction == "right" then
@@ -235,9 +217,7 @@ function snake.wiggle(x, y, direction, flag)
 end
 
 function snake.setDirection(newDirection)
-    if snake.pendingTurn then
-        return
-    end
+    if snake.pendingTurn then return end
 
     if snake.direction == "left" or snake.direction == "right" then
         if newDirection == "down" then

@@ -4,9 +4,7 @@ local apples = {}
 
 function apples.pendingSnake(x, y, pendingSnakePos)
     for _, v in pairs(pendingSnakePos) do
-        if v.x == x and v.y == y then
-            return true
-        end
+        if v.x == x and v.y == y then return true end
     end
     return false
 end
@@ -30,7 +28,6 @@ function apples.spawn(grid, snake)
         end
     end
 
-    --print(count .. " valid spawn points!")
     if count == 0 then
         print("No valid points")
         return

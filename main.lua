@@ -49,7 +49,7 @@ function startGame()
     screenEffect.chromasep.radius = 3
     screenEffect.chromasep.angle = 8
 
-    music.start(hitBeat, endSong)
+    music.start(hitBeat)
     level.start(grid)
     snake.start(eatApple, die, grid)
     apples.spawn(grid, snake)
@@ -102,10 +102,6 @@ function love.draw()
                         if not oddCol and flag then
                             love.graphics.setColor(color)
                         end
-                    end
-
-                    if grid[i][j] == "tail" then
-                        -- love.graphics.setColor(1, 1, 1)
                     end
 
                     love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 130,

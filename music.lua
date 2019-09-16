@@ -9,7 +9,6 @@ local gameoverLoop = {}
 local lastBeat = -1
 local beat = 0
 local beatFrac = 0
-local lastPos = -1
 local gracePeriod = false
 local state = {}
 local indicator = {x = 250, y = 660, width = 400, height = 40}
@@ -102,12 +101,6 @@ function music.draw()
                                colors.green)
     love.graphics.print("Multiplier: " .. music.multiplier, 650, 660)
     if gracePeriod then love.graphics.rectangle("fill", 600, 660, 40, 40) end
-    -- love.graphics.print(round(beatFrac, 1), 150, 660)
-    -- love.graphics.print(beat, 250, 660)
-
-    if music.multiplier == 1 then
-        -- return
-    end
 
     love.graphics.rectangle("fill",
                             indicator.x + indicator.width / 2 * beatFrac,
@@ -117,16 +110,6 @@ function music.draw()
 
     local alpha = 1.0 - beatFrac
     love.graphics.setColor(colors.fade(colors.pink, alpha))
-    --[[ 
-    if lastPos >= 0 then
-        love.graphics.rectangle(
-            "fill",
-            indicator.x + indicator.width / 2 - lastPos * indicator.width / 2,
-            indicator.y,
-            lastPos * indicator.width,
-            indicator.height / 4
-        )
-    end ]]
 end
 
 function music.hitKey()
