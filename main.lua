@@ -3,12 +3,11 @@ local apples = require("apples")
 local level = require("level")
 local particles = require("particles")
 local audio = require("audio")
-local music = require("music")
+local musicManager = require("musicManager")
 local moonshine = require("lib/moonshine")
 local colors = require("colors")
 
 local mainFont = {}
-local score = 0
 local state = {}
 local grid = {}
 local screenEffect = {}
@@ -25,10 +24,8 @@ function love.load()
     love.graphics.print("Loading...", 320, 300, 0, 1.5)
     love.graphics.present()
 
-    screenEffect = moonshine(moonshine.effects.crt).chain(
-                       moonshine.effects.scanlines).chain(
-                       moonshine.effects.chromasep)
-                       .chain(moonshine.effects.glow)
+    screenEffect = moonshine(moonshine.effects.crt).chain(moonshine.effects.scanlines)
+                       .chain(moonshine.effects.chromasep).chain(moonshine.effects.glow)
     screenEffect.chromasep.radius = 3
     screenEffect.chromasep.angle = 8
     screenEffect.scanlines.opacity = 0.5
@@ -37,19 +34,19 @@ function love.load()
     appleEffect = moonshine(moonshine.effects.glow)
 
     audio.init()
+    musicManager.init(newBeat)
     showMenu()
 end
 
 function showMenu() state = "start" end
 
 function startGame()
-    score = 0
     state = "running"
 
     screenEffect.chromasep.radius = 3
     screenEffect.chromasep.angle = 8
 
-    music.start(hitBeat)
+    musicManager.start()
     level.start(grid)
     snake.start(eatApple, die, grid)
     apples.spawn(grid, snake)
@@ -58,7 +55,7 @@ end
 
 function love.update(dt)
     if state == "running" then
-        music.update()
+        musicManager.update()
         snake.update(dt, grid)
     end
     particles.update(dt)
@@ -79,9 +76,8 @@ function love.draw()
         love.graphics.setColor(colors.gray)
         love.graphics.rectangle("fill", 50, 130, 800, 520)
 
-        if music.multiplier > 1 then
-            local color = flag and colors.darken(colors.green) or
-                              colors.darken(colors.blue)
+        if musicManager.multiplier > 1 then
+            local color = flag and colors.darken(colors.green) or colors.darken(colors.blue)
             for i = 0, 19 do
                 oddCol = i % 2 == 1
                 for j = 0, 12 do
@@ -89,23 +85,14 @@ function love.draw()
                     oddRow = j % 2 == 1
 
                     if oddRow then
-                        if oddCol and flag then
-                            love.graphics.setColor(color)
-                        end
-                        if not oddCol and not flag then
-                            love.graphics.setColor(color)
-                        end
+                        if oddCol and flag then love.graphics.setColor(color) end
+                        if not oddCol and not flag then love.graphics.setColor(color) end
                     else
-                        if oddCol and not flag then
-                            love.graphics.setColor(color)
-                        end
-                        if not oddCol and flag then
-                            love.graphics.setColor(color)
-                        end
+                        if oddCol and not flag then love.graphics.setColor(color) end
+                        if not oddCol and flag then love.graphics.setColor(color) end
                     end
 
-                    love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 130,
-                                            40, 40)
+                    love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 130, 40, 40)
                 end
             end
         end
@@ -113,14 +100,12 @@ function love.draw()
         snake.draw(flag)
 
         local apple = level.getApple(grid)
-        if apple then
-            appleEffect(function() apples.draw(apple, flag) end)
-        end
+        if apple then appleEffect(function() apples.draw(apple, flag) end) end
 
-        music.draw()
+        musicManager.draw()
         particles.draw()
 
-        love.graphics.print("Score: " .. score, 350, 70)
+        love.graphics.print("Score: " .. musicManager.points, 350, 70)
 
         if state == "running" then
         else
@@ -150,10 +135,9 @@ function love.keypressed(key, _, _)
     if state == "running" then
         print(command)
 
-        if command == "right" or command == "left" or command == "down" or
-            command == "up" then
+        if command == "right" or command == "left" or command == "down" or command == "up" then
             local success = snake.setDirection(command)
-            if success then music.hitKey() end
+            if success then musicManager.directionChange() end
         end
     elseif state == "gameover" then
         if command == "space" then
@@ -169,7 +153,7 @@ end
 
 function eatApple(x, y)
     audio.play("eatApple")
-    score = score + music.score()
+    musicManager.increaseScore()
 
     level.clear(grid, x, y)
     particles.eatApple(x * 40 + 50, (y + 2) * 40 + 50)
@@ -177,11 +161,11 @@ function eatApple(x, y)
 end
 
 function die(x, y)
-    music.endGame()
+    musicManager.endGame()
     audio.play("die")
 
     state = "gameover"
     particles.die(x * 40 + 50, (y + 2) * 40 + 50)
 end
 
-function hitBeat() flag = not flag end
+function newBeat() flag = not flag end
