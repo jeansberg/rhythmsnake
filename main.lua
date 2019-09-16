@@ -19,6 +19,7 @@ local flag = false
 function love.load()
     math.randomseed(os.time())
     love.window.setMode(900, 700)
+    love.window.setTitle("Rhythm Snake")
     mainFont = love.graphics.newFont("mago3.ttf", 48)
     love.graphics.setFont(mainFont)
     love.graphics.print("Loading...", 320, 300, 0, 1.5)
