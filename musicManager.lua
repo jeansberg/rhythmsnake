@@ -16,7 +16,7 @@ function musicManager.init(newBeat) musicManager.newBeat = newBeat end
 function musicManager.start()
     gracePeriod = false
     musicManager.points = 0
-    musicManager.multiplier = 0
+    musicManager.multiplier = 1
     audio.start()
     state = "waitingForBeat"
 end

@@ -35,6 +35,7 @@ function love.load()
 
     audio.init()
     musicManager.init(newBeat)
+    snake.init(eatApple, die)
     showMenu()
 end
 
@@ -48,7 +49,7 @@ function startGame()
 
     musicManager.start()
     level.start(grid)
-    snake.start(eatApple, die, grid)
+    snake.start(grid)
     apples.spawn(grid, snake)
     particles.start()
 end
