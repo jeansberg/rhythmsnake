@@ -1,20 +1,17 @@
+-- Responsible for spawning apples
+local apples = {}
 local level = require("level")
 local colors = require("colors")
-local apples = {}
 
+-- Indicates whether a position will be occupied by the snake after the next movement step
 function apples.pendingSnake(x, y, pendingSnakePos)
-    for _, v in pairs(pendingSnakePos) do
-        if v.x == x and v.y == y then return true end
-    end
+    for _, v in pairs(pendingSnakePos) do if v.x == x and v.y == y then return true end end
     return false
 end
 
+-- Spawn an apple
 function apples.spawn(grid, snake)
     local pendingSnakePos = snake.pendingPosition
-    local str = ""
-    for _, v in pairs(pendingSnakePos) do
-        str = str .. v.x .. "," .. v.y .. " "
-    end
 
     local validPoints = {}
     local count = 0
@@ -37,6 +34,7 @@ function apples.spawn(grid, snake)
     level.addApple(grid, validPoints[rnd].x, validPoints[rnd].y)
 end
 
+-- Called from the main draw loop
 function apples.draw(apple, flag)
     local x = apple.col * 40 + 50
     local y = apple.row * 40 + 80 + 50
