@@ -1,7 +1,7 @@
+-- Responsible for moving, drawing and growing the snake
+local snake = {}
 local level = require("level")
 local colors = require("colors")
-
-local snake = {}
 local size = 40
 local speed = 266
 snake.pendingChild = nil
@@ -13,7 +13,14 @@ snake.active = {}
 snake.eatApple = {}
 snake.die = {}
 
-function snake.start(eatApple, die, grid)
+-- Initializes the module with a callbacks for when an apple is eaten or the snake dies
+function snake.init(eatApple, die)
+    snake.eatApple = eatApple
+    snake.die = die
+end
+
+-- Resets the snake size and position
+function snake.start(grid)
     snake.rowFrac = 0
     snake.colFrac = 0
     snake.row = 6
@@ -35,13 +42,10 @@ function snake.start(eatApple, die, grid)
     table.insert(snake.pendingPosition, {x = 10, y = 6})
     table.insert(snake.pendingPosition, {x = 9, y = 6})
     table.insert(snake.pendingPosition, {x = 8, y = 6})
-
     snake.active = true
-    snake.eatApple = eatApple
-    snake.die = die
-    grid[snake.row][snake.col] = "head"
 end
 
+-- Called from the main update loop
 function snake.update(dt, grid)
     if not snake.active then return end
 
@@ -73,65 +77,61 @@ function snake.update(dt, grid)
         end
     end
 
-    if snake.lastCol ~= snake.col or snake.lastRow ~= snake.row then
-        snake.pendingTurn = false
-        if level.collision(grid, snake.col, snake.row) then
-            snake.col = snake.lastCol
-            snake.row = snake.lastRow
-            snake.die(snake.col, snake.row)
-            snake.active = false
-            return
-        end
+    if snake.lastCol ~= snake.col or snake.lastRow ~= snake.row then snake.move(grid) end
+end
 
-        snake.pendingPosition = {}
-        local nextHeadPos = {x = snake.col, y = snake.row}
-        local direction = snake.direction
+-- Moves the snake
+function snake.move(grid)
+    snake.pendingTurn = false
+    if level.collision(grid, snake.col, snake.row) then
+        snake.col = snake.lastCol
+        snake.row = snake.lastRow
+        snake.die(snake.col, snake.row)
+        snake.active = false
+        return
+    end
 
-        if direction == "left" then
-            nextHeadPos.x = nextHeadPos.x - 1
-        elseif direction == "right" then
-            nextHeadPos.x = nextHeadPos.x + 1
-        elseif direction == "up" then
-            nextHeadPos.y = nextHeadPos.y - 1
-        elseif direction == "down" then
-            nextHeadPos.y = nextHeadPos.y + 1
-        end
+    snake.pendingPosition = {}
+    local nextHeadPos = {x = snake.col, y = snake.row}
+    local direction = snake.direction
 
-        table.insert(snake.pendingPosition, nextHeadPos)
+    if direction == "left" then
+        nextHeadPos.x = nextHeadPos.x - 1
+    elseif direction == "right" then
+        nextHeadPos.x = nextHeadPos.x + 1
+    elseif direction == "up" then
+        nextHeadPos.y = nextHeadPos.y - 1
+    elseif direction == "down" then
+        nextHeadPos.y = nextHeadPos.y + 1
+    end
 
-        if snake.pendingChild ~= nil then
-            snake.addChild(grid, snake.pendingChild)
-        end
+    table.insert(snake.pendingPosition, nextHeadPos)
 
-        snake.moveChildren(grid)
+    if snake.pendingChild ~= nil then snake.addChild(grid, snake.pendingChild) end
 
-        if grid[snake.col][snake.row] == 0 then
-            level.setSnake(grid, snake.col, snake.row)
-        end
+    snake.moveChildren(grid)
 
-        if grid[snake.col][snake.row] == "apple" then
-            local snakeEnd = snake
+    if grid[snake.col][snake.row] == 0 then level.setSnake(grid, snake.col, snake.row) end
 
-            while snakeEnd.child ~= nil do snakeEnd = snakeEnd.child end
+    if grid[snake.col][snake.row] == "apple" then
+        local snakeEnd = snake
 
-            snake.pendingChild = snakeEnd
-            table.insert(snake.pendingPosition,
-                         {x = snakeEnd.col, y = snakeEnd.row})
-            snake.eatApple(snake.col, snake.row)
-        end
+        while snakeEnd.child ~= nil do snakeEnd = snakeEnd.child end
+
+        snake.pendingChild = snakeEnd
+        table.insert(snake.pendingPosition, {x = snakeEnd.col, y = snakeEnd.row})
+        snake.eatApple(snake.col, snake.row)
     end
 end
 
+-- Adds the pending child to the snake
 function snake.addChild(grid, snakeEnd)
-    snakeEnd.child = {
-        col = snakeEnd.col,
-        row = snakeEnd.row,
-        direction = snakeEnd.direction
-    }
+    snakeEnd.child = {col = snakeEnd.col, row = snakeEnd.row, direction = snakeEnd.direction}
     level.addTail(grid, snakeEnd.col, snakeEnd.row)
     snake.pendingChild = nil
 end
 
+-- Moves the tail parts
 function snake.moveChildren(grid)
     local snakeEnd = snake
 
@@ -157,6 +157,7 @@ function snake.moveChildren(grid)
     end
 end
 
+-- Draws the snake head
 function snake.drawHead()
     local x = snake.col * size + 50
     local y = snake.row * size + 80 + 50
@@ -165,6 +166,7 @@ function snake.drawHead()
     love.graphics.setColor(colors.black)
 end
 
+-- Called from the main draw function
 function snake.draw(flag)
     love.graphics.setColor(colors.purple)
 
@@ -179,15 +181,14 @@ function snake.draw(flag)
 
         local tailX = snakeEnd.col * size + 5 + 50
         local tailY = snakeEnd.row * size + 5 + 80 + 50
-        if snakeEnd.child == nil then
-            tailX, tailY = snake.wiggle(tailX, tailY, snakeEnd.direction, flag)
-        end
+        if snakeEnd.child == nil then tailX, tailY = snake.wiggle(tailX, tailY, snakeEnd.direction, flag) end
 
         love.graphics.rectangle("fill", tailX, tailY, size - 10, size - 10)
     end
     love.graphics.setColor(1, 1, 1, 1)
 end
 
+-- Wiggles the end of the tail
 function snake.wiggle(x, y, direction, flag)
     if flag then
         -- wiggle right
@@ -216,6 +217,7 @@ function snake.wiggle(x, y, direction, flag)
     return x, y
 end
 
+-- Changes the snake's direction if the input is valid (snake can only turn 90 degrees at a time)
 function snake.setDirection(newDirection)
     if snake.pendingTurn then return end
 
