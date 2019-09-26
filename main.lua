@@ -1,9 +1,12 @@
 local snake = require("snake")
+
+Debugging = false
 local apples = require("apples")
 local level = require("level")
 local particles = require("particles")
 local audio = require("audio")
 local musicManager = require("musicManager")
+local messageManager = require("messageManager")
 local moonshine = require("lib/moonshine")
 local colors = require("colors")
 
@@ -34,10 +37,12 @@ function love.load()
     appleEffect = moonshine(moonshine.effects.glow)
 
     audio.init()
-    musicManager.init(newBeat)
+    musicManager.init(newBeat, messageManager)
     snake.init(eatApple, die)
     showMenu()
 end
+
+IfDebug = function(fn) if Debugging then fn() end end
 
 function showMenu() state = "start" end
 
@@ -59,6 +64,7 @@ function love.update(dt)
         musicManager.update()
         snake.update(dt, grid)
     end
+    messageManager.update(dt)
     particles.update(dt)
 end
 
@@ -75,7 +81,7 @@ function love.draw()
         local oddRow = false
         local oddCol = false
         love.graphics.setColor(colors.gray)
-        love.graphics.rectangle("fill", 50, 130, 800, 520)
+        love.graphics.rectangle("fill", 50, 120, 800, 520)
 
         if musicManager.multiplier > 1 then
             local color = flag and colors.darken(colors.green) or colors.darken(colors.blue)
@@ -93,7 +99,7 @@ function love.draw()
                         if not oddCol and flag then love.graphics.setColor(color) end
                     end
 
-                    love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 130, 40, 40)
+                    love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 120, 40, 40)
                 end
             end
         end
@@ -104,9 +110,11 @@ function love.draw()
         if apple then appleEffect(function() apples.draw(apple, flag) end) end
 
         musicManager.draw()
+        messageManager.draw()
         particles.draw()
 
         love.graphics.print("Score: " .. musicManager.points, 350, 70)
+        IfDebug(function() love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10) end)
 
         if state == "running" then
         else
@@ -134,11 +142,9 @@ function love.keypressed(key, _, _)
     local command = getCommand(key)
 
     if state == "running" then
-        print(command)
-
         if command == "right" or command == "left" or command == "down" or command == "up" then
-            local success = snake.setDirection(command)
-            if success then musicManager.directionChange() end
+            snake.setDirection(command)
+            musicManager.directionChange()
         end
     elseif state == "gameover" then
         if command == "space" then
@@ -158,6 +164,7 @@ function eatApple(x, y)
 
     level.clear(grid, x, y)
     particles.eatApple(x * 40 + 50, (y + 2) * 40 + 50)
+    messageManager.eatApple(x * 40 + 50, (y + 2) * 40 + 50)
     apples.spawn(grid, snake)
 end
 

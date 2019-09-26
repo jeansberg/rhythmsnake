@@ -160,7 +160,7 @@ end
 -- Draws the snake head
 function snake.drawHead()
     local x = snake.col * size + 50
-    local y = snake.row * size + 80 + 50
+    local y = snake.row * size + 120
 
     love.graphics.rectangle("fill", x, y, size, size)
     love.graphics.setColor(colors.black)
@@ -180,7 +180,7 @@ function snake.draw(flag)
         snakeEnd = snakeEnd.child
 
         local tailX = snakeEnd.col * size + 5 + 50
-        local tailY = snakeEnd.row * size + 5 + 80 + 50
+        local tailY = snakeEnd.row * size + 5 + 120
         if snakeEnd.child == nil then tailX, tailY = snake.wiggle(tailX, tailY, snakeEnd.direction, flag) end
 
         love.graphics.rectangle("fill", tailX, tailY, size - 10, size - 10)

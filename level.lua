@@ -8,9 +8,7 @@ function level.start(grid)
 end
 
 function level.setSnake(grid, x, y)
-    for x = 0, 19 do
-        for y = 0, 12 do if grid[x][y] == "head" then grid[x][y] = 0 end end
-    end
+    for x = 0, 19 do for y = 0, 12 do if grid[x][y] == "head" then grid[x][y] = 0 end end end
 
     if grid[x][y] == "apple" then print("Moved head on apple") end
 
@@ -22,17 +20,11 @@ function level.addApple(grid, x, y) grid[x][y] = "apple" end
 function level.clear(grid, x, y) grid[x][y] = 0 end
 
 function level.getApple(grid)
-    for x = 0, 19 do
-        for y = 0, 12 do
-            if grid[x][y] == "apple" then return {col = x, row = y} end
-        end
-    end
+    for x = 0, 19 do for y = 0, 12 do if grid[x][y] == "apple" then return {col = x, row = y} end end end
 end
 
 function level.addTail(grid, col, row)
-    if grid[col][row] == "apple" then
-        print("Added tail on apple" .. col .. ", " .. row)
-    end
+    if grid[col][row] == "apple" then print("Added tail on apple" .. col .. ", " .. row) end
 
     if row == nil then
         print("row was nil")
@@ -69,7 +61,5 @@ function level.collision(grid, col, row)
 
     return false
 end
-
-function level.draw() end
 
 return level

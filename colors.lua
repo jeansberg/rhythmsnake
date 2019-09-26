@@ -9,12 +9,8 @@ colors.gray = {0.2, 0.2, 0.2}
 colors.black = {0, 0, 0}
 colors.white = {1, 1, 1}
 
-function colors.darken(color)
-    return {color[1] / 2.0, color[2] / 2.0, color[3] / 2.0}
-end
+function colors.darken(color) return {color[1] / 2.0, color[2] / 2.0, color[3] / 2.0} end
 
-function colors.fade(color, alpha)
-    return {color[1], color[2], color[3], alpha}
-end
+function colors.fade(color, alpha) return {color[1], color[2], color[3], alpha} end
 
 return colors

@@ -37,7 +37,7 @@ end
 -- Called from the main draw loop
 function apples.draw(apple, flag)
     local x = apple.col * 40 + 50
-    local y = apple.row * 40 + 80 + 50
+    local y = apple.row * 40 + 120
     love.graphics.setColor(colors.pink)
     love.graphics.rectangle("fill", x, y, 40, 40)
     love.graphics.setColor(colors.black)
