@@ -17,6 +17,8 @@ local screenEffect = {}
 local appleEffect = {}
 
 local flag = false
+local phase = 0
+local descending = false
 
 function love.load()
     math.randomseed(os.time())
@@ -66,6 +68,22 @@ function love.update(dt)
     end
     messageManager.update(dt)
     particles.update(dt)
+
+    if descending then
+        phase = phase - dt * 5
+    else
+        phase = phase + dt * 5
+    end
+
+    if phase <= 180 then
+        descending = false
+    end
+
+    if phase >= 180 then
+        descending = true
+    end
+
+     screenEffect.scanlines.phase = phase
 end
 
 function love.draw()
@@ -177,4 +195,4 @@ function die(x, y)
     particles.die(x * 40 + 50, (y + 2) * 40 + 50)
 end
 
-function newBeat() flag = not flag end
+function newBeat() flag = not flag  end
