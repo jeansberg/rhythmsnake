@@ -110,9 +110,10 @@ function love.draw()
         if apple then appleEffect(function() apples.draw(apple, flag) end) end
 
         musicManager.draw()
-        messageManager.draw()
         particles.draw()
+        messageManager.draw()
 
+        love.graphics.setColor(colors.white)
         love.graphics.print("Score: " .. musicManager.points, 350, 70)
         IfDebug(function() love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10) end)
 
