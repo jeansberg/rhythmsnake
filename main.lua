@@ -86,11 +86,6 @@ function love.update(dt)
     if phase >= 180 then descending = true end
 
     screenEffect.scanlines.phase = phase
-
-    if state == "gameover" then
-        screenEffect.chromasep.angle = 2 + phase / 90
-        screenEffect.chromasep.radius = 3 + phase / 180 * 2
-    end
 end
 
 function love.draw()
