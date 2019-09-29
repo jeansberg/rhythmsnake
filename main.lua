@@ -29,8 +29,10 @@ function love.load()
     love.graphics.print("Loading...", 320, 300, 0, 1.5)
     love.graphics.present()
 
-    screenEffect = moonshine(moonshine.effects.crt).chain(moonshine.effects.scanlines)
-                       .chain(moonshine.effects.chromasep).chain(moonshine.effects.glow)
+    screenEffect = moonshine(moonshine.effects.crt).chain(
+                       moonshine.effects.scanlines).chain(
+                       moonshine.effects.chromasep)
+                       .chain(moonshine.effects.glow)
     screenEffect.chromasep.radius = 3
     screenEffect.chromasep.angle = 8
     screenEffect.scanlines.opacity = 0.5
@@ -46,7 +48,11 @@ end
 
 IfDebug = function(fn) if Debugging then fn() end end
 
-function showMenu() state = "start" end
+function showMenu()
+    state = "menu"
+    audio.start()
+    audio.toggleSongPhase("gameover")
+end
 
 function startGame()
     state = "running"
@@ -75,25 +81,26 @@ function love.update(dt)
         phase = phase + dt * 5
     end
 
-    if phase <= 180 then
-        descending = false
-    end
+    if phase <= 180 then descending = false end
 
-    if phase >= 180 then
-        descending = true
-    end
+    if phase >= 180 then descending = true end
 
-     screenEffect.scanlines.phase = phase
+    screenEffect.scanlines.phase = phase
+
+    if state == "gameover" then
+        screenEffect.chromasep.angle = 2 + phase / 90
+        screenEffect.chromasep.radius = 3 + phase / 180 * 2
+    end
 end
 
 function love.draw()
     screenEffect(function()
         love.graphics.print("Rhythm Snake", 260, 10, 0, 1.5)
 
-        if state == "start" then
-            love.graphics.print("Goal: Eat apples", 300, 200, 0)
+        if state == "menu" then
+            love.graphics.print({colors.white, "Goal: Eat ", colors.pink, "apples"}, 300, 200, 0)
             love.graphics.print("Controls: Arrow keys or WASD", 190, 250, 0)
-            love.graphics.print("Press SPACE to start", 270, 350)
+            love.graphics.print({colors.white, "Press ", colors.green, "SPACE", colors.white, " to start"}, 270, 350)
             return
         end
         local oddRow = false
@@ -102,7 +109,8 @@ function love.draw()
         love.graphics.rectangle("fill", 50, 120, 800, 520)
 
         if musicManager.multiplier > 1 then
-            local color = flag and colors.darken(colors.green) or colors.darken(colors.blue)
+            local color = flag and colors.darken(colors.green) or
+                              colors.darken(colors.blue)
             for i = 0, 19 do
                 oddCol = i % 2 == 1
                 for j = 0, 12 do
@@ -110,14 +118,23 @@ function love.draw()
                     oddRow = j % 2 == 1
 
                     if oddRow then
-                        if oddCol and flag then love.graphics.setColor(color) end
-                        if not oddCol and not flag then love.graphics.setColor(color) end
+                        if oddCol and flag then
+                            love.graphics.setColor(color)
+                        end
+                        if not oddCol and not flag then
+                            love.graphics.setColor(color)
+                        end
                     else
-                        if oddCol and not flag then love.graphics.setColor(color) end
-                        if not oddCol and flag then love.graphics.setColor(color) end
+                        if oddCol and not flag then
+                            love.graphics.setColor(color)
+                        end
+                        if not oddCol and flag then
+                            love.graphics.setColor(color)
+                        end
                     end
 
-                    love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 120, 40, 40)
+                    love.graphics.rectangle("fill", i * 40 + 50, j * 40 + 120,
+                                            40, 40)
                 end
             end
         end
@@ -125,7 +142,9 @@ function love.draw()
         snake.draw(flag)
 
         local apple = level.getApple(grid)
-        if apple then appleEffect(function() apples.draw(apple, flag) end) end
+        if apple then
+            appleEffect(function() apples.draw(apple, flag) end)
+        end
 
         musicManager.draw()
         particles.draw()
@@ -133,12 +152,15 @@ function love.draw()
 
         love.graphics.setColor(colors.white)
         love.graphics.print("Score: " .. musicManager.points, 350, 70)
-        IfDebug(function() love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10) end)
+        IfDebug(function()
+            love.graphics.print(
+                "Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+        end)
 
         if state == "running" then
         else
             love.graphics.print("Game over!", 340, 220)
-            love.graphics.print("Press SPACE to restart", 240, 300)
+            love.graphics.print({colors.white, "Press ", colors.green, "SPACE", colors.white, " to restart"}, 240, 300)
         end
     end)
 end
@@ -161,9 +183,10 @@ function love.keypressed(key, _, _)
     local command = getCommand(key)
 
     if state == "running" then
-        if command == "right" or command == "left" or command == "down" or command == "up" then
-            snake.setDirection(command)
-            musicManager.directionChange()
+        if command == "right" or command == "left" or command == "down" or
+            command == "up" then
+            local directionChanged = snake.setDirection(command)
+            if directionChanged then musicManager.directionChange() end
         end
     elseif state == "gameover" then
         if command == "space" then
@@ -172,7 +195,7 @@ function love.keypressed(key, _, _)
             audio.play("bang")
             particles.random()
         end
-    elseif state == "start" then
+    elseif state == "menu" then
         if command == "space" then startGame() end
     end
 end
@@ -195,4 +218,4 @@ function die(x, y)
     particles.die(x * 40 + 50, (y + 2) * 40 + 50)
 end
 
-function newBeat() flag = not flag  end
+function newBeat() flag = not flag end
