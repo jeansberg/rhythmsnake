@@ -196,7 +196,8 @@ function love.keypressed(key, _, _)
 end
 
 function eatApple(x, y)
-    audio.play("eatApple")
+    audio.play("raiseMultiplier", musicManager.multiplier)
+    audio.play("crunch")
     musicManager.increaseScore()
 
     level.clear(grid, x, y)
