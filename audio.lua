@@ -12,6 +12,7 @@ function audio.init()
     sfx.crunch = love.audio.newSource("content/crunch.wav", "static")
     sfx.crunch:setVolume(0.8)
     sfx.bang = love.audio.newSource("content/bang.wav", "static")
+    sfx.bang:setVolume(0.5)
     sfx.reset = love.audio.newSource("content/reset.wav", "static")
 
     -- Set all song phases to loop with zero volume
