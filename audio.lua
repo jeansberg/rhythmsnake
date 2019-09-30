@@ -8,7 +8,9 @@ function audio.init()
     sfx.die = love.audio.newSource("content/die.wav", "static")
     sfx.raiseMultiplier = love.audio.newSource("content/raiseMultiplier.wav",
                                                "static")
+    sfx.raiseMultiplier:setVolume(0.8)
     sfx.crunch = love.audio.newSource("content/crunch.wav", "static")
+    sfx.crunch:setVolume(0.8)
     sfx.bang = love.audio.newSource("content/bang.wav", "static")
     sfx.reset = love.audio.newSource("content/reset.wav", "static")
 
