@@ -2,8 +2,15 @@ local messageManager = {}
 local colors = require("colors")
 local messages = {}
 
-function addMessage(text, x, y, color)
-    local message = {text = text, x = x, y = y, color = color, timer = 1}
+function addMessage(type, text, x, y, color)
+    local message = {
+        type = type,
+        text = text,
+        x = x,
+        y = y,
+        color = color,
+        timer = 1
+    }
     table.insert(messages, message)
 end
 
@@ -24,10 +31,28 @@ function messageManager.draw()
     end
 end
 
+function clearPrevious()
+    for i = #messages, 1, -1 do
+        local m = messages[i]
+        if m.type == "hit" or m.type == "miss" then
+            table.remove(messages, i)
+        end
+    end
+end
 function messageManager.start() messages = {} end
 
-function messageManager.missBeat() addMessage("Miss!", 410, 620, colors.pink) end
+function messageManager.missBeat()
+    clearPrevious()
+    addMessage("miss", "Miss!", 410, 620, colors.pink)
+end
 
-function messageManager.eatApple(x, y) addMessage("+1", x, y, colors.green) end
+function messageManager.hitBeat(quality)
+    clearPrevious()
+    addMessage("hit", quality .. "!", 420, 620, colors.white)
+end
+
+function messageManager.eatApple(x, y)
+    addMessage("eat", "+1", x, y, colors.green)
+end
 
 return messageManager
