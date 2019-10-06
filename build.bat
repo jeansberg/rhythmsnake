@@ -1,0 +1,1 @@
+copy /b "C:\Program Files\LOVE\love.exe"+game.love "publish\game.exe"
