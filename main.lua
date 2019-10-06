@@ -1,6 +1,6 @@
 local snake = require("snake")
 
-Debugging = false
+Debugging = true
 local apples = require("apples")
 local level = require("level")
 local particles = require("particles")
@@ -41,7 +41,7 @@ function love.load()
     appleEffect = moonshine(moonshine.effects.glow)
 
     audio.init()
-    musicManager.init(newBeat, messageManager)
+    musicManager.init(newBeatCallback, messageManager)
     snake.init(eatApple, die)
     showMenu()
 end
@@ -214,4 +214,4 @@ function die(x, y)
     particles.die(x * 40 + 50, (y + 2) * 40 + 50)
 end
 
-function newBeat() flag = not flag end
+function newBeatCallback() flag = not flag end
